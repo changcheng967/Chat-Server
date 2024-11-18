@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -20,14 +20,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/account-system');
+const mongoUri = process.env.MONGO_URI;
+
+mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
+});
 
 // Session Middleware
 const sessionMiddleware = session({
     secret: 'secret-key',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/account-system' })
+    store: MongoStore.create({ mongoUrl: mongoUri })
 });
 
 app.use(sessionMiddleware);
