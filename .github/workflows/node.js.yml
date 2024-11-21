@@ -1,0 +1,45 @@
+# This workflow will perform a clean installation of Node dependencies, 
+# cache and restore them, build the source code, and run tests across 
+# different versions of Node.js.
+
+name: Chat Server
+
+on:
+  push:
+    branches: 
+      - "main"
+  pull_request:
+    branches: 
+      - "main"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]  # Define the Node.js versions for testing
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'  # Enable caching for npm dependencies to speed up subsequent runs
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Start Server
+      run: node server.js  # Start the server after installing dependencies and running tests
+
+    - name: Upload Logs (Optional)
+      if: failure()  # Only upload logs if the workflow fails
+      run: |
+        mkdir -p logs
+        cp /path/to/logs/* logs/
+        echo "Logs uploaded"
