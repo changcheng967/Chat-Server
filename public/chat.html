@@ -1,43 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat</title>
+    <title>Chat Room v3.7.8</title>
     <style>
-        body { font: 14px sans-serif; }
-        #messages { list-style-type: none; padding: 0; }
-        #messages li { padding: 8px; border-bottom: 1px solid #ddd; }
-        #form { display: flex; }
-        #input { flex: 1; padding: 10px; }
-        #button { padding: 10px; }
+        body {
+            font: 14px sans-serif;
+            background-image: url('https://th.bing.com/th/id/R.8f9dcf42e2f016e3e2706e77ee872fd1?rik=P37NPAVZIj%2fB9g&riu=http%3a%2f%2fmedia.cntraveler.com%2fphotos%2f57cf057cc69c03020b6e99c9%2fmaster%2fpass%2fcanada-national-parks-Banff-GettyImages-543346047.jpg&ehk=2CeB8XQizeCdCOMQyz%2flHnn5TOIVe%2bFcr6KbmXYR%2fr0%3d&risl=&pid=ImgRaw&r=0');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+        }
+        .chat-box {
+            width: 100%;
+            height: 70%;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .chat-rules {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        input, button {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <ul id="messages"></ul>
-    <form id="form">
-        <input id="input" autocomplete="off" placeholder="Type a message..." /><button id="button">Send</button>
-    </form>
+    <div class="chat-container">
+        <h2>Welcome to the Chat Room v3.7.8</h2>
+        <div id="chatBox" class="chat-box"></div>
+        <input type="text" id="messageInput" placeholder="Type a message...">
+        <button id="sendMessage">Send</button>
+        <div class="chat-rules">
+            <h3>Chat Rules</h3>
+            <ul>
+                <li>No spam or advertisements</li>
+                <li>Be respectful to others</li>
+                <li>No hate speech or bullying</li>
+                <li>Keep the chat relevant to the topic</li>
+                <li>Please respect the creator of this page</li>
+            </ul>
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
 
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-        const messages = document.getElementById('messages');
+        const chatBox = document.getElementById('chatBox');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageButton = document.getElementById('sendMessage');
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
+        // Get room ID from URL
+        const urlParams = new URLSearchParams(window.location.pathname.split('/')[2]);
+        const roomId = urlParams.toString() || '0000';  // Default room ID for the public room
+
+        // Join the specified room upon loading
+        socket.emit('join room', roomId);
+
+        // Listen for chat messages
+        socket.on('chat message', (data) => {
+            if (data.roomId === roomId) {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `${data.username} (${data.timestamp}): ${data.content}`;
+                messageElement.classList.add('message');
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
         });
 
-        socket.on('chat message', function(msg) {
-            const item = document.createElement('li');
-            item.textContent = msg;
-            messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+        // Handle the send button click
+        sendMessageButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                socket.emit('chat message', { roomId, msg: message });
+                messageInput.value = '';
+            }
+        });
+
+        // Handle the Enter key press
+        messageInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                sendMessageButton.click();
+            }
         });
     </script>
 </body>
