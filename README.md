@@ -61,10 +61,16 @@ If the login is successful, you will be redirected to the chat interface.
 ```graphql
 /Chat-Server
 │
-├── index.html           # HTML file containing the registration and login forms
-├── styles.css           # CSS file for styling the forms and layout
-├── app.js               # JavaScript for handling the registration and login forms
-└── README.md            # This readme file
+├── Dockerfile            # File to build Docker image for deployment
+├── LICENSE               # Project license file
+├── README.md             # This README file
+├── package-lock.json     # Dependency lock file
+├── package.json          # Project metadata and dependencies
+├── public/               # Static assets (e.g., HTML, CSS, JS)
+├── server.js             # Main server file for handling routes and logic
+├── node_modules/         # Installed dependencies
+└── Chat-Server.zip       # Zipped version of the project
+
 ```
 ## Contributing
 If you'd like to contribute to this project, please fork the repository and create a pull request with your changes. Make sure to follow the coding conventions used in the project.
