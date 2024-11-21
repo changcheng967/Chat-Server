@@ -1,0 +1,33 @@
+name: Chat Server
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm install
+
+    # Start the server
+    - name: Start Server
+      run: node server.js
+      env:
+        MONGO_URL: ${{ secrets.MONGO_URI }} # For sensitive data, use GitHub Secrets
