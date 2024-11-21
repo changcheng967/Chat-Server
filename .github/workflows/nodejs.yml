@@ -30,4 +30,4 @@ jobs:
     - name: Start Server
       run: node server.js
       env:
-        MONGO_URL: ${{ secrets.MONGO_URI }} # For sensitive data, use GitHub Secrets
+        MONGO_URL: ${{ secrets.MONGO_URL }} # For sensitive data, use GitHub Secrets
